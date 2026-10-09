@@ -1,0 +1,2 @@
+# Architecture rules
+- Football Management is a nested Organizational Tools workspace with shared typed, session-scoped records; this preserves existing tools and keeps preview data separate from production systems.
