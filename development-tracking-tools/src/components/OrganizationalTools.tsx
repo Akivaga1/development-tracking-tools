@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Building2, Users, Monitor, BarChart3, TrendingUp, Calendar, Target, CheckCircle, AlertTriangle, Clock, DollarSign, Brain, Package } from 'lucide-react';
+import { ArrowLeft, Building2, Users, Monitor, BarChart3, TrendingUp, Calendar, Target, CheckCircle, AlertTriangle, Clock, DollarSign, Brain, Package, Kanban } from 'lucide-react';
 import { DTTRemote } from './DTTRemote';
 import { TeamDashboards } from './TeamDashboards';
 import { KPITracking } from './KPITracking';
@@ -10,14 +10,23 @@ import { SalesTracking } from './SalesTracking';
 import { BurnoutTracking } from './BurnoutTracking';
 import { BusinessDevelopmentTracker } from './BusinessDevelopmentTracker';
 import { FootballManagement } from './FootballManagement';
+import { IntegratedProjectManager } from './IntegratedProjectManager';
 
 interface OrganizationalToolsProps {
   onBack: () => void;
 }
 
-type ActiveView = 'main' | 'team-dashboards' | 'dtt-remote' | 'kpi-tracking' | 'sales-tracking' | 'burnout-tracking' | 'business-development' | 'football-management';
+type ActiveView = 'main' | 'team-dashboards' | 'dtt-remote' | 'kpi-tracking' | 'sales-tracking' | 'burnout-tracking' | 'business-development' | 'football-management' | 'project-manager';
 
 const organizationalModules = [
+  {
+    id: 'project-manager',
+    title: 'Integrated Project Manager',
+    description: '10 PMBOK key areas: Scope, Schedule, Cost, Quality, Resources, Comms, Risk, Procurement & Stakeholders',
+    icon: Kanban,
+    gradient: 'bg-gradient-hero',
+    stats: { label: 'PM Areas', value: '10 active', trend: 'up' as const }
+  },
   {
     id: 'football-management',
     title: 'Football Management',
@@ -162,6 +171,9 @@ export function OrganizationalTools({ onBack }: OrganizationalToolsProps) {
   // Render specific component based on active view
   if (activeView === 'football-management') {
     return <FootballManagement onBack={handleBackToMain} />;
+  }
+  if (activeView === 'project-manager') {
+    return <IntegratedProjectManager onBack={handleBackToMain} />;
   }
   if (activeView === 'team-dashboards') {
     return <TeamDashboards onBack={handleBackToMain} />;

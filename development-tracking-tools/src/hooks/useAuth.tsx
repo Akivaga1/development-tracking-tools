@@ -1,10 +1,23 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { djangoApi, AuthUser } from '@/lib/djangoApi';
+
+export interface AppUser {
+  id: string;
+  email: string;
+  user_metadata?: {
+    full_name?: string;
+  };
+  full_name?: string;
+}
+
+export interface AppSession {
+  user: AppUser;
+  access_token: string;
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: AppUser | null;
+  session: AppSession | null;
   loading: boolean;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
@@ -26,56 +39,110 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [session, setSession] = useState<AppSession | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+    // Initialize auth from stored Django session
+    const storedUser = djangoApi.getStoredUser();
+    const token = localStorage.getItem('dtt_access_token');
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    if (token && storedUser) {
+      const appUser: AppUser = {
+        id: String(storedUser.id),
+        email: storedUser.email,
+        full_name: storedUser.full_name,
+        user_metadata: { full_name: storedUser.full_name },
+      };
+      setUser(appUser);
+      setSession({ user: appUser, access_token: token });
+
+      // Silently refresh profile in background
+      djangoApi.getMe()
+        .then((fresh) => {
+          const updated: AppUser = {
+            id: String(fresh.id),
+            email: fresh.email,
+            full_name: fresh.full_name,
+            user_metadata: { full_name: fresh.full_name },
+          };
+          setUser(updated);
+          setSession({ user: updated, access_token: token });
+        })
+        .catch(() => {
+          // If offline or network unreachable, retain stored user session
+        })
+        .finally(() => setLoading(false));
+    } else {
       setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    }
   }, []);
 
   const signUp = async (email: string, password: string, fullName?: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName
-        }
+    try {
+      const data = await djangoApi.register(email, password, fullName);
+      const appUser: AppUser = {
+        id: String(data.user.id),
+        email: data.user.email,
+        full_name: data.user.full_name,
+        user_metadata: { full_name: data.user.full_name },
+      };
+      setUser(appUser);
+      setSession({ user: appUser, access_token: data.access });
+      return { error: null };
+    } catch (err: any) {
+      // In local offline mode fallback
+      if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) {
+        const fallbackUser: AppUser = {
+          id: `local-${Date.now()}`,
+          email,
+          full_name: fullName || email.split('@')[0],
+          user_metadata: { full_name: fullName || email.split('@')[0] },
+        };
+        djangoApi.setTokens('offline_token', 'offline_refresh', fallbackUser as any);
+        setUser(fallbackUser);
+        setSession({ user: fallbackUser, access_token: 'offline_token' });
+        return { error: null };
       }
-    });
-    return { error };
+      return { error: { message: err.message || 'Registration failed' } };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      const data = await djangoApi.login(email, password);
+      const appUser: AppUser = {
+        id: String(data.user.id),
+        email: data.user.email,
+        full_name: data.user.full_name,
+        user_metadata: { full_name: data.user.full_name },
+      };
+      setUser(appUser);
+      setSession({ user: appUser, access_token: data.access });
+      return { error: null };
+    } catch (err: any) {
+      // In local offline mode fallback
+      if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) {
+        const fallbackUser: AppUser = {
+          id: `local-${Date.now()}`,
+          email,
+          full_name: email.split('@')[0],
+          user_metadata: { full_name: email.split('@')[0] },
+        };
+        djangoApi.setTokens('offline_token', 'offline_refresh', fallbackUser as any);
+        setUser(fallbackUser);
+        setSession({ user: fallbackUser, access_token: 'offline_token' });
+        return { error: null };
+      }
+      return { error: { message: err.message || 'Invalid email or password' } };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await djangoApi.logout();
+    setUser(null);
+    setSession(null);
     window.location.href = '/auth';
   };
 

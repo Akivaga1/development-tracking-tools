@@ -133,7 +133,20 @@ export function CareerDevelopment({ onBack, onNavigate }: CareerDevelopmentProps
                 <p className="text-sm text-muted-foreground">Professional growth and skill development</p>
               </div>
             </div>
-            <Badge variant="secondary" className="bg-violet-800 text-white">Plus</Badge>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  window.print();
+                }}
+                className="text-xs border-primary/40 text-primary"
+              >
+                <Award className="w-3.5 h-3.5 mr-1.5" />
+                Export Achievements (PDF)
+              </Button>
+              <Badge variant="secondary" className="bg-primary text-white">Pro Tier</Badge>
+            </div>
           </div>
         </div>
       </div>
@@ -205,8 +218,11 @@ export function CareerDevelopment({ onBack, onNavigate }: CareerDevelopmentProps
 
         {/* Recent Achievements */}
         <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
-          <h3 className="text-lg font-semibold mb-4 text-foreground">Recent Achievements</h3>
-          <Card className="border-border/50">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-foreground">Recent Achievements & Certifications</h3>
+            <span className="text-xs text-muted-foreground">Synchronized with LinkedIn & Portfolio</span>
+          </div>
+          <Card className="border-border/50 shadow-soft">
             <CardContent className="p-6">
               <div className="space-y-4">
                 {recentAchievements.map((achievement, index) => (
@@ -227,6 +243,25 @@ export function CareerDevelopment({ onBack, onNavigate }: CareerDevelopmentProps
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Professional Journaling Prompts */}
+        <div className="animate-slide-up" style={{ animationDelay: '0.5s' }}>
+          <h3 className="text-lg font-semibold mb-4 text-foreground">Professional & Innovation Journal Prompts</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="border-border/50 p-4 bg-secondary/30">
+              <strong className="text-sm text-foreground block mb-1">Career Vector Reflection</strong>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                "What capability did I leverage most effectively this week, and what high-value skill requires deliberate practice in the next quarter?"
+              </p>
+            </Card>
+            <Card className="border-border/50 p-4 bg-secondary/30">
+              <strong className="text-sm text-foreground block mb-1">Innovation Pipeline Trigger</strong>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                "What repetitive friction point in our workflow could be eliminated or automated through a creative systemic solution?"
+              </p>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

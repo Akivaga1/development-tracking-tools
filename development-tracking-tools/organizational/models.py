@@ -171,3 +171,144 @@ class BusinessGoal(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# ─── OKR (Objectives and Key Results) ────────────────────────────────────────
+
+class Objective(models.Model):
+    STATUS_CHOICES = [
+        ('on_track', 'On Track'), ('at_risk', 'At Risk'),
+        ('behind', 'Behind'), ('completed', 'Completed'),
+    ]
+    SCOPE_CHOICES = [
+        ('company', 'Company'), ('department', 'Department'), ('team', 'Team'), ('individual', 'Individual'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='objectives')
+    title = models.CharField(max_length=300)
+    description = models.TextField(blank=True)
+    scope = models.CharField(max_length=15, choices=SCOPE_CHOICES, default='team')
+    quarter = models.CharField(max_length=2, blank=True)
+    year = models.PositiveIntegerField(null=True, blank=True)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='on_track')
+    overall_progress = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'objectives'
+        ordering = ['year', 'quarter', 'title']
+
+    def __str__(self):
+        return self.title
+
+
+class KeyResult(models.Model):
+    STATUS_CHOICES = [
+        ('not_started', 'Not Started'), ('in_progress', 'In Progress'),
+        ('done', 'Done'), ('cancelled', 'Cancelled'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    objective = models.ForeignKey(Objective, on_delete=models.CASCADE, related_name='key_results')
+    description = models.CharField(max_length=400)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='not_started')
+    progress = models.PositiveIntegerField(default=0)
+    target_value = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    current_value = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    unit = models.CharField(max_length=50, blank=True)
+    due_date = models.DateField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'key_results'
+        ordering = ['due_date']
+
+    def __str__(self):
+        return self.description
+
+
+# ─── DTT Remote Timesheets ───────────────────────────────────────────────────
+
+class RemoteTimesheet(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='timesheets')
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True, related_name='timesheets')
+    date = models.DateField()
+    hours_logged = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    tasks_summary = models.TextField(blank=True)
+    productivity_score = models.PositiveSmallIntegerField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'remote_timesheets'
+        ordering = ['-date']
+        unique_together = [('user', 'date', 'team')]
+
+    def __str__(self):
+        return f'{self.user.email} — {self.date}: {self.hours_logged}h'
+
+
+# ─── Community & Coaching ────────────────────────────────────────────────────
+
+class CommunityGroup(models.Model):
+    TYPE_CHOICES = [
+        ('journaling', 'Group Journaling'), ('project', 'Shared Project'),
+        ('coaching', 'Coaching Pod'), ('faithflow', 'FaithFlow'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='community_groups')
+    name = models.CharField(max_length=200)
+    group_type = models.CharField(max_length=15, choices=TYPE_CHOICES, default='journaling')
+    description = models.TextField(blank=True)
+    is_private = models.BooleanField(default=False)
+    member_count = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'community_groups'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name
+
+
+class GroupJournalEntry(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    group = models.ForeignKey(CommunityGroup, on_delete=models.CASCADE, related_name='journal_entries')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='group_journal_entries')
+    title = models.CharField(max_length=300, blank=True)
+    content = models.TextField()
+    prompt_used = models.CharField(max_length=400, blank=True)
+    mood = models.PositiveSmallIntegerField(null=True, blank=True)
+    is_anonymous = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'group_journal_entries'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.author.email} — {self.group.name}'
+
+
+class FaithFlowStreak(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='faithflow_streaks')
+    date = models.DateField()
+    devotional_completed = models.BooleanField(default=False)
+    mindfulness_minutes = models.PositiveSmallIntegerField(default=0)
+    gratitude_note = models.TextField(blank=True)
+    scripture_verse = models.CharField(max_length=400, blank=True)
+    reflection = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'faithflow_streaks'
+        unique_together = [('user', 'date')]
+        ordering = ['-date']
+
+    def __str__(self):
+        return f'{self.user.email} — FaithFlow {self.date}'

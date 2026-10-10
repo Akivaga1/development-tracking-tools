@@ -76,6 +76,30 @@ const executiveModules = [
       value: '12 monthly',
       trend: 'stable' as const
     }
+  },
+  {
+    id: 'decision-deck',
+    title: 'Decision Deck (Scenario Planning)',
+    description: 'Map visions, test scenarios (Best Case, Baseline, Stress Test) and analyze trade-offs',
+    icon: Target,
+    gradient: 'bg-gradient-hero',
+    stats: {
+      label: 'Scenarios',
+      value: '4 Active Models',
+      trend: 'up' as const
+    }
+  },
+  {
+    id: 'executive-wellness',
+    title: 'Executive Wellness Check-in',
+    description: 'Monitor cognitive load, decision fatigue, sleep recovery and executive resilience',
+    icon: Crown,
+    gradient: 'bg-gradient-wellness',
+    stats: {
+      label: 'Resilience Index',
+      value: '88/100',
+      trend: 'stable' as const
+    }
   }
 ];
 
@@ -551,6 +575,227 @@ export function ExecutiveClass({ onBack }: ExecutiveClassProps) {
                       </div>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (activeModule === 'decision-deck') {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b bg-card/60 backdrop-blur-sm sticky top-0 z-50">
+          <div className="container mx-auto px-6 py-4">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" onClick={handleBackToMain}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Executive Class
+              </Button>
+              <div className="w-10 h-10 rounded-lg bg-gradient-hero flex items-center justify-center text-white shadow-soft">
+                <Target className="w-6 h-6" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold font-heading text-foreground">
+                  Decision Deck & Scenario Planning
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Map visions, model Best/Baseline/Stress scenarios, and align strategic trade-offs
+                </p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-6 py-8 space-y-6">
+          {/* Strategic Horizons Vision Map */}
+          <Card className="border-border/60 shadow-soft">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-heading">Vision Map (Strategic Horizons)</CardTitle>
+              <CardDescription>Multi-year objective pathways from current operations to transformative impact</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl border border-border/50 bg-secondary/30 space-y-2">
+                  <Badge variant="outline" className="text-xs text-primary border-primary/40">Horizon 1 (0–12 Months)</Badge>
+                  <h4 className="font-bold text-sm text-foreground">Operational Excellence</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Solidify real-time sync across mobile/web, scale M-Pesa & Stripe recurring subscriptions, and integrate voice tone analytics.
+                  </p>
+                  <Progress value={85} className="h-1.5 mt-2" />
+                </div>
+                <div className="p-4 rounded-xl border border-border/50 bg-secondary/30 space-y-2">
+                  <Badge variant="outline" className="text-xs text-primary border-primary/40">Horizon 2 (1–3 Years)</Badge>
+                  <h4 className="font-bold text-sm text-foreground">Emerging Markets Leadership</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Deploy full offline mode across Sub-Saharan Africa and Asia, establishing DTT as standard tool for civic & corporate development.
+                  </p>
+                  <Progress value={50} className="h-1.5 mt-2" />
+                </div>
+                <div className="p-4 rounded-xl border border-border/50 bg-secondary/30 space-y-2">
+                  <Badge variant="outline" className="text-xs text-primary border-primary/40">Horizon 3 (3–5 Years)</Badge>
+                  <h4 className="font-bold text-sm text-foreground">Autonomous Growth Ecosystem</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    AI agentic goal coaching, predictive burnout prevention, and parliamentary/board governance intelligence suites.
+                  </p>
+                  <Progress value={20} className="h-1.5 mt-2" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Scenario Planning Deck */}
+          <div>
+            <h3 className="text-lg font-bold font-heading text-foreground mb-3">Decision Deck Scenarios</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="border-emerald-500/30 shadow-soft bg-gradient-to-br from-card to-emerald-500/[0.03]">
+                <CardHeader className="pb-2">
+                  <Badge className="w-fit bg-emerald-600 text-white text-xs mb-1">Scenario A: Best Case</Badge>
+                  <CardTitle className="text-base font-heading">High Growth Surge (+35%)</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-xs leading-relaxed">
+                  <p className="text-muted-foreground">
+                    Bulk licensing adoption exceeds targets by 40%. Cloud infrastructure automatically autoscales.
+                  </p>
+                  <div className="p-2.5 rounded-lg bg-card border border-border/50 space-y-1">
+                    <span className="font-semibold text-foreground block">Key Action:</span>
+                    <span>Accelerate international team hiring and release multi-language localization ahead of schedule.</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground pt-1">
+                    <span>Confidence: 78%</span>
+                    <span className="text-emerald-600 font-bold">ROI: +42%</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-primary/30 shadow-soft bg-gradient-to-br from-card to-primary/[0.03]">
+                <CardHeader className="pb-2">
+                  <Badge className="w-fit bg-primary text-white text-xs mb-1">Scenario B: Baseline</Badge>
+                  <CardTitle className="text-base font-heading">Steady Planned Scale (+18%)</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-xs leading-relaxed">
+                  <p className="text-muted-foreground">
+                    Consistent growth along established roadmap milestones. Churn remains low at &lt;2.1%.
+                  </p>
+                  <div className="p-2.5 rounded-lg bg-card border border-border/50 space-y-1">
+                    <span className="font-semibold text-foreground block">Key Action:</span>
+                    <span>Maintain lean headcount, optimize unit economics, and focus on high-LTV organizational accounts.</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground pt-1">
+                    <span>Confidence: 91%</span>
+                    <span className="text-primary font-bold">ROI: +24%</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-amber-500/30 shadow-soft bg-gradient-to-br from-card to-amber-500/[0.03]">
+                <CardHeader className="pb-2">
+                  <Badge className="w-fit bg-amber-600 text-white text-xs mb-1">Scenario C: Stress Test</Badge>
+                  <CardTitle className="text-base font-heading">Contraction & Tightening (-10%)</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-xs leading-relaxed">
+                  <p className="text-muted-foreground">
+                    Macroeconomic slowdown delays procurement cycles in large parastatal and enterprise accounts.
+                  </p>
+                  <div className="p-2.5 rounded-lg bg-card border border-border/50 space-y-1">
+                    <span className="font-semibold text-foreground block">Key Action:</span>
+                    <span>Freeze non-essential marketing, extend runway to 28 months, pivot to grassroots and self-serve Pro tiers.</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground pt-1">
+                    <span>Probability: 22%</span>
+                    <span className="text-amber-600 font-bold">Runway: Safe</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (activeModule === 'executive-wellness') {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b bg-card/60 backdrop-blur-sm sticky top-0 z-50">
+          <div className="container mx-auto px-6 py-4">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" onClick={handleBackToMain}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Executive Class
+              </Button>
+              <div className="w-10 h-10 rounded-lg bg-gradient-wellness flex items-center justify-center text-white shadow-soft">
+                <Crown className="w-6 h-6" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold font-heading text-foreground">
+                  Executive Wellness Check-in
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Protecting leadership cognitive reserves, emotional clarity, and strategic endurance
+                </p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-6 py-8 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-center">
+            <Card className="p-4 border-border/50">
+              <span className="text-xs text-muted-foreground block">Cognitive Load Index</span>
+              <span className="text-2xl font-bold font-heading text-primary">Balanced (64%)</span>
+              <span className="text-[11px] text-muted-foreground mt-1 block">Optimal bandwidth</span>
+            </Card>
+            <Card className="p-4 border-border/50">
+              <span className="text-xs text-muted-foreground block">Decision Fatigue Score</span>
+              <span className="text-2xl font-bold font-heading text-emerald-600">Low (22%)</span>
+              <span className="text-[11px] text-emerald-600 mt-1 block">Sharp discernment</span>
+            </Card>
+            <Card className="p-4 border-border/50">
+              <span className="text-xs text-muted-foreground block">Sleep Recovery Quality</span>
+              <span className="text-2xl font-bold font-heading text-foreground">7.8 hrs / night</span>
+              <span className="text-[11px] text-muted-foreground mt-1 block">REM & Deep rested</span>
+            </Card>
+            <Card className="p-4 border-border/50">
+              <span className="text-xs text-muted-foreground block">Resilience Index</span>
+              <span className="text-2xl font-bold font-heading text-primary">88 / 100</span>
+              <span className="text-[11px] text-primary mt-1 block">Executive grade</span>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="border-border/60 shadow-soft">
+              <CardHeader>
+                <CardTitle className="text-base font-heading">Strategic Boundaries & Deep Work</CardTitle>
+                <CardDescription>Rules to preserve high-level executive thinking</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 text-xs leading-relaxed">
+                <div className="p-3 rounded-lg bg-secondary/40 border border-border/40">
+                  <strong className="text-foreground block mb-0.5">Morning Meeting Blackout</strong>
+                  <span className="text-muted-foreground">Keep 08:00–11:00 meeting-free for deep analytical and vision tasks.</span>
+                </div>
+                <div className="p-3 rounded-lg bg-secondary/40 border border-border/40">
+                  <strong className="text-foreground block mb-0.5">Delegation Threshold</strong>
+                  <span className="text-muted-foreground">Any decision under $5,000 or reversible within 48h is delegated to operational leads.</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/60 shadow-soft">
+              <CardHeader>
+                <CardTitle className="text-base font-heading">Recovery & Reset Protocol</CardTitle>
+                <CardDescription>Active stress mitigation for leaders</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 text-xs leading-relaxed">
+                <div className="p-3 rounded-lg bg-secondary/40 border border-border/40">
+                  <strong className="text-foreground block mb-0.5">Somatic Regulation</strong>
+                  <span className="text-muted-foreground">Use 4-7-8 breathing before entering board meetings or press sessions.</span>
+                </div>
+                <div className="p-3 rounded-lg bg-secondary/40 border border-border/40">
+                  <strong className="text-foreground block mb-0.5">FaithFlow / Reflection Time</strong>
+                  <span className="text-muted-foreground">15 minutes daily intentional pause to disconnect from external friction.</span>
                 </div>
               </CardContent>
             </Card>
